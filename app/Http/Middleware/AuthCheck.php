@@ -17,9 +17,12 @@ class AuthCheck
     public function handle(Request $request, Closure $next): Response
     {
         if (!Session::has('loginId')) {
-            return redirect()->route('auth.index')->with('error', 'You must be logged in.');
+            return redirect()->route('auth.index')->with('error', 'You must be logged in to access this page.');
         }
 
-        return $next($request);
+        // Prevent caching of protected pages
+        return $next($request)->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+                              ->header('Pragma', 'no-cache')
+                              ->header('Expires', '0');
     }
 }

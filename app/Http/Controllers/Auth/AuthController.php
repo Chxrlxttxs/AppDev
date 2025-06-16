@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 
 class AuthController extends Controller
@@ -25,11 +26,10 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        $loginAuth = User::where('email', '=', $request->email)
-            ->first();
+        $user = User::where('email', '=', $request->email)->first();
 
-        if ($loginAuth) {
-            Session::put('loginId', $loginAuth->id);
+        if ($user && Hash::check($request->password, $user->password)) {
+            Session::put('loginId', $user->id);
             return redirect()->route('std.myView')->with('success', 'Login successfully');
         } else {
             return back()->with('error', 'Invalid email or password');
@@ -48,15 +48,16 @@ class AuthController extends Controller
     public function userRegister(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'email' => 'required',
-            'password' => 'required',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => 'required|min:6',
         ]);
 
-        $input['name'] = $request->name;
-        $input['email'] = $request->email;
-        $input['password'] = bcrypt($request->password);
-        User::create($input);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
 
         return redirect()->route('auth.index')->with('success', 'Registration successful, please login');
     }
@@ -65,7 +66,8 @@ class AuthController extends Controller
     public function logout()
     {
         if (Session::has('loginId')) {
-            Session::pull('loginId');
+            Session::forget('loginId');
+            Session::flush();
             return redirect()->route('auth.index')->with('success', 'Logout successfully');
         } else {
             return redirect()->route('auth.index')->with('error', 'You are not logged in');

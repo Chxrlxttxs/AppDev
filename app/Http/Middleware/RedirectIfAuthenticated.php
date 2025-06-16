@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Symfony\Component\HttpFoundation\Response;
 
-class loginMiddleware
+class RedirectIfAuthenticated
 {
     /**
      * Handle an incoming request.
@@ -16,9 +16,10 @@ class loginMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(Session::get('user')){
-            return redirect('/students');
+        if (Session::has('loginId')) {
+            return redirect()->route('std.myView');
         }
+
         return $next($request);
     }
 }

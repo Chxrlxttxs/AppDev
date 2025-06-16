@@ -27,14 +27,14 @@
                             @csrf
                             <div class="mb-3">
                                 <label class="form-label">Email Address</label>
-                                <input type="text" class="form-control" id="email" name="email" value="{{ old('email') }}" placeholder="Enter email">
+                                <input type="email" class="form-control" id="email" name="email" value="{{ old('email') }}" placeholder="Enter email">
                                 @error('email')
                                 <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">Password</label>
-                                <input type="text" class="form-control" id="password" name="password" value="{{ old('password') }}" placeholder="Enter password">
+                                <input type="password" class="form-control" id="password" name="password" placeholder="Enter password">
                                 @error('password')
                                 <span class="text-danger">{{ $message }}</span>
                                 @enderror
